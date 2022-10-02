@@ -1,3 +1,9 @@
 vma450cli
 *.o
 *.swp
+.tmp_versions
+*.cmd
+Module.symvers
+modules.order
+*.ko
+*.mod.c
