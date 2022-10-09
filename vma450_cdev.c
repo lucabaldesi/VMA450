@@ -5,6 +5,7 @@
 #include <linux/module.h>
 
 #include "vma450_cdev.h"
+#include "vma450_i2c.h"
 
 
 static int major;
@@ -71,6 +72,7 @@ ssize_t device_read(struct file *filp, /* see include/linux/fs.h   */
 ssize_t device_write(struct file *filp, const char __user *buff,
                      size_t len, loff_t *off)
 {
-	pr_alert("Sorry, this operation is not supported.\n");
-	return -EINVAL;
+	pr_info("writing to the display\n");
+	vma450_i2c_send(buff, len);
+	return 80;
 }
