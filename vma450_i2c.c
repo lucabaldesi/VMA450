@@ -25,6 +25,8 @@
 #define VMA450_CONF_5x8 0x00
 #define VMA450_CONF_5x11 0x04
 
+#define USLEEP_RANGE 4*1000, 5*1000
+
 #define MIN(a, b) ((a<b) ? (a) : (b))
 
 static struct i2c_client *vma450_dev = NULL;
@@ -34,7 +36,7 @@ int vma450_i2c_read(struct i2c_client *client, char *buf)
 	int res = 0;
 	if (buf) {
 		res = i2c_master_recv(client, buf, 1);
-		usleep_range (5*1000, 10*1000);
+		usleep_range (USLEEP_RANGE);
 	}
 	return res;
 }
@@ -60,10 +62,10 @@ int vma450_i2c_write_4bit(struct i2c_client *client, __u8 head, __u8 data)
 
 	buff = head | ((data & 0x0f)<<4) | ENABLE_BIT;
 	ret = i2c_master_send(client, &buff, 1);
-	usleep_range (5*1000, 10*1000);
+	usleep_range (USLEEP_RANGE);
 	buff = buff & (~ENABLE_BIT);
 	ret = i2c_master_send(client, &buff, 1);
-	usleep_range (5*1000, 10*1000);
+	usleep_range (USLEEP_RANGE);
 	return ret;
 }
 
@@ -167,7 +169,7 @@ int pcf8574_init(struct i2c_client *client, __u8 conf)
 {
 	int ret;
 	ret = i2c_master_send(client, &conf, 1);
-	usleep_range (5*1000, 10*1000);
+	usleep_range (USLEEP_RANGE);
 	return ret;
 }
 
@@ -235,9 +237,9 @@ void vma450_i2c_write_str(struct i2c_client *client, const char * str)
 void vma450_i2c_write_str_2lines(struct i2c_client *client, const char * str, int len)
 {
 	int i = 0, j = 0;
-	char buffer[80];
+	char buffer[81];
 	
-	memset(buffer, 0, 80);
+	memset(buffer, ' ', 80);
 
 	while (i<len && j<80) {
 		buffer[j] = str[i];
@@ -258,14 +260,20 @@ void vma450_i2c_write_str_2lines(struct i2c_client *client, const char * str, in
 				break;
 		}
 	}
-
+	buffer[80] = '\0';
+	len = strlen(buffer);
 	vma450_i2c_clear(client);
+	pr_info("string is \"%s\", len is %d\n", buffer, len);
 	vma450_i2c_write_str(client, buffer);
 }
 
 void vma450_i2c_send(const char *text, int len)
 {
-	vma450_i2c_write_str_2lines(vma450_dev, text, len);
+	if (vma450_dev) {
+		vma450_i2c_display_set(vma450_dev, 0, 1, 0);
+		vma450_i2c_write_str_2lines(vma450_dev, text, len);
+		vma450_i2c_display_set(vma450_dev, 1, 1, 0);
+	}
 }
 
 int vma450_i2c_init(int intf_init)
@@ -276,10 +284,9 @@ int vma450_i2c_init(int intf_init)
 		if (intf_init) {
 			pcf8574_init(vma450_dev, 0x00);  // configure all outputs
 			vma450_i2c_write_4bit(vma450_dev, VMA450_CMD, 0x02);  // configure 4-bit operations
+			/* the line below can be executed only after a Power-On-Reset */
+			vma450_i2c_write(vma450_dev, VMA450_CMD, 0x20 | VMA450_CONF_2LINES | VMA450_CONF_5x11);  // set num of lines and font
 		}
-
-		/* the line below can be executed only after a Power-On-Reset */
-		vma450_i2c_write(vma450_dev, VMA450_CMD, 0x20 | VMA450_CONF_2LINES | VMA450_CONF_5x11);  // set num of lines and font
 
 		vma450_i2c_display_set(vma450_dev, 1, 1, 0);
 		vma450_i2c_mode_set(vma450_dev, 1, 0); 
