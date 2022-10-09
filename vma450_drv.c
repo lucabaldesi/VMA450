@@ -24,7 +24,6 @@ static int __init vma450_init(void)
 {
 	int res;
 
-	pr_info("Hello, world 2\n");
 	res = vma450_i2c_init(intf_init);
 	if (res)
 		return res;
@@ -39,7 +38,6 @@ static int __init vma450_init(void)
 
 static void __exit vma450_exit(void)
 {
-	pr_info("Goodbye, world 2\n");
 	vma450_i2c_cleanup();
 	vma450_cdev_cleanup();
 }

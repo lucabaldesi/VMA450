@@ -49,7 +49,6 @@ int vma450_probe(struct i2c_client *client)
 	int res;
 	__u8 buf;
 
-	pr_info("probe called!\n");
 	res = vma450_i2c_read(client, &buf);
 	return (res > 0) ? 1 : 0;
 }
@@ -115,10 +114,6 @@ i2c_new_client_device(struct i2c_adapter *adap, struct i2c_board_info const *inf
 
 	dev_set_name(&client->dev, "%s", "vma450");
 	status = device_register(&client->dev);
-	if(dev_name(&client->dev))
-		pr_info("all good\n");
-	else
-		pr_info("name error\n");
 	if (status)
 		goto out_remove_swnode;
 
@@ -152,7 +147,6 @@ int vma450_i2c_scan(void)
 	struct i2c_adapter *i2c_adap;
 	struct i2c_board_info i2c_info;
 
-	pr_info("starting scanning\n");
 	adap_n = 0;
 	while (!vma450_dev && adap_n < 2) {
 		i2c_adap = i2c_get_adapter(adap_n);

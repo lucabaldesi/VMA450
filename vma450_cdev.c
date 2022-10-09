@@ -26,14 +26,13 @@ int vma450_cdev_init(void)
 	major = register_chrdev(0, DEVICE_NAME, &chardev_fops);
 
 	if (major < 0) {
-		pr_alert("Registering char device failed with %d\n", major);
+		pr_alert("[VMA450] Registering char device failed with %d\n", major);
 		return major;
 	}
 	
-	pr_info("I was assigned major number %d.\n", major);
 	cls = class_create(THIS_MODULE, DEVICE_NAME);
 	device_create(cls, NULL, MKDEV(major, 0), NULL, DEVICE_NAME);
-	pr_info("Device created on /dev/%s\n", DEVICE_NAME);
+	pr_info("[VMA450] Device created on /dev/%s\n", DEVICE_NAME);
 
 	return 0;
 }
@@ -72,7 +71,6 @@ ssize_t device_read(struct file *filp, /* see include/linux/fs.h   */
 ssize_t device_write(struct file *filp, const char __user *buff,
                      size_t len, loff_t *off)
 {
-	pr_info("writing to the display\n");
 	vma450_i2c_send(buff, len-1);
 	return 80;
 }
