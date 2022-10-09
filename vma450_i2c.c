@@ -26,6 +26,7 @@
 #define VMA450_CONF_5x11 0x04
 
 #define USLEEP_RANGE 4*1000, 5*1000
+#define SHORT_USLEEP_RANGE 40, 50
 
 #define MIN(a, b) ((a<b) ? (a) : (b))
 
@@ -46,15 +47,6 @@ int vma450_remove(struct i2c_client *client)
 	return 0;
 }
 
-int vma450_probe(struct i2c_client *client)
-{
-	int res;
-	__u8 buf;
-
-	res = vma450_i2c_read(client, &buf);
-	return (res > 0) ? 1 : 0;
-}
-
 int vma450_i2c_write_4bit(struct i2c_client *client, __u8 head, __u8 data)
 {
 	int ret;
@@ -62,10 +54,16 @@ int vma450_i2c_write_4bit(struct i2c_client *client, __u8 head, __u8 data)
 
 	buff = head | ((data & 0x0f)<<4) | ENABLE_BIT;
 	ret = i2c_master_send(client, &buff, 1);
-	usleep_range (USLEEP_RANGE);
+	if (head == VMA450_CMD)
+		usleep_range (USLEEP_RANGE);
+	else
+		usleep_range (SHORT_USLEEP_RANGE);
 	buff = buff & (~ENABLE_BIT);
 	ret = i2c_master_send(client, &buff, 1);
-	usleep_range (USLEEP_RANGE);
+	if (head == VMA450_CMD)
+		usleep_range (USLEEP_RANGE);
+	else
+		usleep_range (SHORT_USLEEP_RANGE);
 	return ret;
 }
 
@@ -261,9 +259,7 @@ void vma450_i2c_write_str_2lines(struct i2c_client *client, const char * str, in
 		}
 	}
 	buffer[80] = '\0';
-	len = strlen(buffer);
 	vma450_i2c_clear(client);
-	pr_info("string is \"%s\", len is %d\n", buffer, len);
 	vma450_i2c_write_str(client, buffer);
 }
 
