@@ -272,6 +272,18 @@ void vma450_i2c_send(const char *text, int len)
 	}
 }
 
+void vma450_i2c_display_on(void)
+{
+	if (vma450_dev)
+		vma450_i2c_display_set(vma450_dev, 1, 1, 0);
+}
+
+void vma450_i2c_display_off(void)
+{
+	if (vma450_dev)
+		vma450_i2c_display_set(vma450_dev, 0, 1, 0);
+}
+
 int vma450_i2c_init(int intf_init)
 {
 	int res;
