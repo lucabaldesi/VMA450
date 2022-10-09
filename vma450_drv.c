@@ -11,6 +11,7 @@
 
 #include "vma450_cdev.h"
 #include "vma450_i2c.h"
+#include "vma450_sysfs.h"
 
 MODULE_AUTHOR("Luca Baldesi <luca@baldesi.ovh>");
 MODULE_DESCRIPTION("Driver for I2C device Whadda VMA450");
@@ -29,8 +30,16 @@ static int __init vma450_init(void)
 		return res;
 
 	res = vma450_cdev_init();
-	if (res)
+	if (res) {
 		vma450_i2c_cleanup();
+		return res;
+	}
+
+	res = vma450_sysfs_init();
+	if (res) {
+		vma450_i2c_cleanup();
+		vma450_cdev_cleanup();
+	}
 
 	return res;
 }
@@ -40,6 +49,7 @@ static void __exit vma450_exit(void)
 {
 	vma450_i2c_cleanup();
 	vma450_cdev_cleanup();
+	vma450_sysfs_cleanup();
 }
 
 module_init(vma450_init);
