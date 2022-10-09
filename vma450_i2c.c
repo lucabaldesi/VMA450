@@ -159,9 +159,8 @@ int vma450_i2c_scan(void)
 		if (i2c_adap) {
 			vma450_i2c_info_init(&i2c_info, 0x27);
 			vma450_dev = i2c_new_client_device(i2c_adap, &i2c_info);
-			if (!IS_ERR(vma450_dev)) {
-				pr_info("Scanning adapt %d, success: %d\n", adap_n, vma450_dev ? 1 : -1);
-				pr_info("Prob result: %d\n", vma450_i2c_probe(vma450_dev));
+			if (IS_ERR(vma450_dev) || vma450_i2c_probe(vma450_dev)==0) {
+				vma450_dev = NULL;
 			}
 		}
 		adap_n++;
