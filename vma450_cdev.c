@@ -71,6 +71,6 @@ ssize_t device_read(struct file *filp, /* see include/linux/fs.h   */
 ssize_t device_write(struct file *filp, const char __user *buff,
                      size_t len, loff_t *off)
 {
-	vma450_i2c_send(buff, len-1);
-	return 80;
+	vma450_i2c_send(buff, len);
+	return len;
 }
