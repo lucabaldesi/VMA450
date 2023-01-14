@@ -25,7 +25,7 @@ $> sudo chmod 777 /dev/vma450lcd
 $> echo hello world > /dev/vma450lcd
 ```
 
-The driver exposes also a sysfs interface, in _/sys/kernel/vma450/_
+The driver exposes also a sysfs interface, in _/sys/kernel/vma450/_.
 As of now, the only implemented control is on the display of the text:
 
 ```

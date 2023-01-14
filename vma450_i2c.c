@@ -266,22 +266,22 @@ void vma450_i2c_write_str_2lines(struct i2c_client *client, const char * str, in
 void vma450_i2c_send(const char *text, int len)
 {
 	if (vma450_dev) {
-		vma450_i2c_display_set(vma450_dev, 0, 1, 0);
+		vma450_i2c_display_set(vma450_dev, 0, 0, 0);
 		vma450_i2c_write_str_2lines(vma450_dev, text, len);
-		vma450_i2c_display_set(vma450_dev, 1, 1, 0);
+		vma450_i2c_display_set(vma450_dev, 1, 0, 0);
 	}
 }
 
 void vma450_i2c_display_on(void)
 {
 	if (vma450_dev)
-		vma450_i2c_display_set(vma450_dev, 1, 1, 0);
+		vma450_i2c_display_set(vma450_dev, 1, 0, 0);
 }
 
 void vma450_i2c_display_off(void)
 {
 	if (vma450_dev)
-		vma450_i2c_display_set(vma450_dev, 0, 1, 0);
+		vma450_i2c_display_set(vma450_dev, 0, 0, 0);
 }
 
 int vma450_i2c_init(int intf_init)
@@ -296,7 +296,7 @@ int vma450_i2c_init(int intf_init)
 			vma450_i2c_write(vma450_dev, VMA450_CMD, 0x20 | VMA450_CONF_2LINES | VMA450_CONF_5x11);  // set num of lines and font
 		}
 
-		vma450_i2c_display_set(vma450_dev, 1, 1, 0);
+		vma450_i2c_display_set(vma450_dev, 1, 0, 0);
 		vma450_i2c_mode_set(vma450_dev, 1, 0); 
 	}
 
